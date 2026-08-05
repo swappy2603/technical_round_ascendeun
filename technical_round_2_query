@@ -1,0 +1,19 @@
+SELECT date , resource_id ,
+case 
+    when is_clock_in = 1 then start_time
+    else min(start_time)
+END AS clock_in_time,
+case 
+    when is_clock_out = 1 then end_time
+    else max(end_time)
+END AS clock_out_time ,
+ROUND(
+    SUM(
+        CAST(strftime('%s', end_time) AS INTEGER) -
+        CAST(strftime('%s', start_time) AS INTEGER)
+    ) / 3600.0,
+    2
+) AS total_hours
+from test_de
+where start_time <= end_time
+group by 1 ,2
